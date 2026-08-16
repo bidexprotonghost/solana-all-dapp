@@ -1,0 +1,41 @@
+# Ignore dependencies
+node_modules/
+.npm
+package-lock.json
+yarn.lock
+
+# Ignore environment variables
+.env
+.env.local
+.env.*.local
+
+# Ignore build outputs
+.next/
+dist/
+build/
+out/
+
+# Ignore IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.log
+
+# Ignore Solana config
+.config/
+id.json
+
+# Ignore Rust build artifacts
+target/
+Cargo.lock
+
+# Ignore testing
+coverage/
+.nyc_output/
+
+# Ignore OS files
+Thumbs.db
+.env.production.local
