@@ -23,16 +23,10 @@ WORKDIR /app
 # Install dumb-init (ensure proper signal handling)
 RUN apk add --no-cache dumb-init
 
-# Copy package files
-COPY app/package.json app/package-lock.json ./
-
-# Install production dependencies only
-RUN npm ci --omit=dev
-
-# Copy built application from builder
-COPY --from=builder /app/.next ./.next
+# Copy standalone output from builder
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.js ./
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
@@ -48,6 +42,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
-
-# Start application
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
