@@ -19,6 +19,9 @@ REPO_URL="https://github.com/bidexprotonghost/solana-all-dapp.git"
 APP_NAME="solana-admin-dapp"
 APP_DIR="/root/${APP_NAME}"
 PORT="3000"
+RPC_URL="${NEXT_PUBLIC_SOLANA_RPC:-https://api.devnet.solana.com}"
+ADMIN_PUBLIC_KEY="${NEXT_PUBLIC_ADMIN_PUBLIC_KEY:-}"
+INTERACTION_WALLET_PRIVATE_KEY="${NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY:-}"
 
 # Colors for messages
 echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
@@ -67,16 +70,23 @@ echo ""
 # Step 5: Install dependencies
 echo -e "${YELLOW}[5/8] Installing npm dependencies...${NC}"
 cd "$APP_DIR/app"
-npm install --production 2>&1 | tail -5
+npm ci 2>&1 | tail -5
 echo -e "${GREEN}✅ Dependencies installed${NC}"
 echo ""
 
 # Step 6: Create environment file
 echo -e "${YELLOW}[6/8] Creating environment configuration...${NC}"
-cat > ".env.local" << 'EOF'
-NEXT_PUBLIC_SOLANA_RPC=https://api.devnet.solana.com
-NEXT_PUBLIC_ADMIN_PUBLIC_KEY=4FmKsov52t3bgxRfNTom7GP7nXqeiCe28XVoNinQkPCM
-NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=2uQWUv5sYKVKmxKKuJhvfdHGefiU8XzRrRdetwuth4eVak2Yn6mhxdEGwWY1jW1pDRLsgRzYfPJEaHutPjXePniM
+if [ -z "$ADMIN_PUBLIC_KEY" ]; then
+    read -r -p "Enter NEXT_PUBLIC_ADMIN_PUBLIC_KEY: " ADMIN_PUBLIC_KEY
+fi
+if [ -z "$INTERACTION_WALLET_PRIVATE_KEY" ]; then
+    read -r -s -p "Enter NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY (base64): " INTERACTION_WALLET_PRIVATE_KEY
+    echo ""
+fi
+cat > ".env.local" << EOF
+NEXT_PUBLIC_SOLANA_RPC=${RPC_URL}
+NEXT_PUBLIC_ADMIN_PUBLIC_KEY=${ADMIN_PUBLIC_KEY}
+NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=${INTERACTION_WALLET_PRIVATE_KEY}
 EOF
 echo -e "${GREEN}✅ Environment configured${NC}"
 echo ""
@@ -92,7 +102,7 @@ echo -e "${YELLOW}[8/8] Setting up PM2 process manager...${NC}"
 npm install -g pm2 -qq
 
 # Create ecosystem config
-cat > "ecosystem.config.js" << 'EOF'
+cat > "ecosystem.config.js" << EOF
 module.exports = {
   apps: [{
     name: 'solana-admin-dapp',
@@ -100,9 +110,9 @@ module.exports = {
     args: 'start',
     cwd: '/root/solana-admin-dapp/app',
     env: {
-      NEXT_PUBLIC_SOLANA_RPC: 'https://api.devnet.solana.com',
-      NEXT_PUBLIC_ADMIN_PUBLIC_KEY: '4FmKsov52t3bgxRfNTom7GP7nXqeiCe28XVoNinQkPCM',
-      NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY: '2uQWUv5sYKVKmxKKuJhvfdHGefiU8XzRrRdetwuth4eVak2Yn6mhxdEGwWY1jW1pDRLsgRzYfPJEaHutPjXePniM'
+      NEXT_PUBLIC_SOLANA_RPC: '${RPC_URL}',
+      NEXT_PUBLIC_ADMIN_PUBLIC_KEY: '${ADMIN_PUBLIC_KEY}',
+      NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY: '${INTERACTION_WALLET_PRIVATE_KEY}'
     },
     instances: 1,
     exec_mode: 'fork',
