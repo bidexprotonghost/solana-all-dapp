@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 import { getWalletAssets, WalletAsset } from '@/lib/wallet-balances';
 
 export default function WalletPortfolio() {

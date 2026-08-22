@@ -1,6 +1,6 @@
-# Solana Admin dApp
+# Elite Interman Admin Portal
 
-A production-ready Solana admin dashboard with wallet integration, SPL token management, Jupiter routing, and Axiom analytics. Built with Next.js 14, TypeScript, Anchor, and Tailwind CSS.
+Elite Interman treasury, governance, and protocol control dashboard for secure wallet operations, staking flows, treasury management, and multi-chain QR tooling. Built with Next.js 14, TypeScript, Anchor, and Tailwind CSS.
 
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue)
@@ -68,8 +68,8 @@ NEXT_PUBLIC_SOLANA_RPC=https://api.devnet.solana.com
 # Required - your admin wallet public key
 NEXT_PUBLIC_ADMIN_PUBLIC_KEY=<your-wallet-address>
 
-# Required - interaction wallet keypair (base64 encoded)
-NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=<base64-keypair>
+# Server-side only - interaction wallet keypair (base64 encoded)
+INTERACTION_WALLET_PRIVATE_KEY=<base64-keypair>
 ```
 
 ### 3. Run Development Server
@@ -206,7 +206,7 @@ docker build -t solana-dapp:latest .
 # Run container
 docker run -p 3000:3000 \
   -e NEXT_PUBLIC_ADMIN_PUBLIC_KEY=<key> \
-  -e NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=<key> \
+  -e INTERACTION_WALLET_PRIVATE_KEY=<key> \
   solana-dapp:latest
 ```
 
@@ -313,7 +313,7 @@ solana-keygen new --no-passphrase -o wallet.json
 cat wallet.json | base64 | tr -d '\n'
 
 # Add to .env.local
-NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=<base64-output>
+INTERACTION_WALLET_PRIVATE_KEY=<base64-output>
 ```
 
 ### Get Admin Address

@@ -1,30 +1,31 @@
 "use client";
 
 import { useState } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { getAxiomStatus } from '@/lib/axiom';
-import { getInteractionWalletAddress, receiveToInteractionWallet, sendFromInteractionWallet } from '@/lib/interaction-wallet';
+import { requestInteractionWallet } from '@/lib/interaction-wallet-client';
 import { getJupiterQuote } from '@/lib/jupiter';
-import { transferToken } from '@/lib/spl-token-transfer';
 
 export default function InteractionWalletPanel() {
+  const { publicKey, signMessage } = useWallet();
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('0.05');
   const [tokenMint, setTokenMint] = useState('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
   const [tokenAmount, setTokenAmount] = useState('10');
   const [status, setStatus] = useState('Ready');
   const [loading, setLoading] = useState(false);
-  const [quote, setQuote] = useState<any>(null);
+  const [quote, setQuote] = useState<Record<string, unknown> | null>(null);
 
-  const wallet = getInteractionWalletAddress();
+  const wallet = publicKey ? publicKey.toBase58() : 'Connect admin wallet';
 
   const handleReceive = async () => {
     setLoading(true);
     setStatus('Requesting airdrop...');
     try {
-      const sig = await receiveToInteractionWallet();
+      const sig = await requestInteractionWallet(signMessage, publicKey?.toBase58(), 'receive');
       setStatus(`Received funds successfully: ${sig.slice(0, 8)}...`);
-    } catch (err: any) {
-      setStatus(err.message || 'Receive failed');
+    } catch (err: unknown) {
+      setStatus((err instanceof Error ? err.message : String(err)) || 'Receive failed');
     } finally {
       setLoading(false);
     }
@@ -34,10 +35,13 @@ export default function InteractionWalletPanel() {
     setLoading(true);
     setStatus('Sending funds...');
     try {
-      const sig = await sendFromInteractionWallet(recipient, Number(amount));
+      const sig = await requestInteractionWallet(signMessage, publicKey?.toBase58(), 'send', {
+        recipient,
+        amount: Number(amount),
+      });
       setStatus(`Sent successfully: ${sig.slice(0, 8)}...`);
-    } catch (err: any) {
-      setStatus(err.message || 'Send failed');
+    } catch (err: unknown) {
+      setStatus((err instanceof Error ? err.message : String(err)) || 'Send failed');
     } finally {
       setLoading(false);
     }
@@ -55,8 +59,8 @@ export default function InteractionWalletPanel() {
       setQuote(result);
       setStatus(`Jupiter route ready: ${result?.outAmount ? Number(result.outAmount).toLocaleString() : 'quote received'}`);
       window.open('https://jup.ag/swap', '_blank', 'noopener,noreferrer');
-    } catch (err: any) {
-      setStatus(err.message || 'Jupiter query failed');
+    } catch (err: unknown) {
+      setStatus((err instanceof Error ? err.message : String(err)) || 'Jupiter query failed');
     } finally {
       setLoading(false);
     }
@@ -68,8 +72,8 @@ export default function InteractionWalletPanel() {
     try {
       const result = await getAxiomStatus();
       setStatus(`Axiom status: ${JSON.stringify(result).slice(0, 80)}...`);
-    } catch (err: any) {
-      setStatus(err.message || 'Axiom check failed');
+    } catch (err: unknown) {
+      setStatus((err instanceof Error ? err.message : String(err)) || 'Axiom check failed');
     } finally {
       setLoading(false);
     }
@@ -79,22 +83,15 @@ export default function InteractionWalletPanel() {
     setLoading(true);
     setStatus('Sending SPL token...');
     try {
-      const raw = process.env.NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY;
-      if (!raw) {
-        throw new Error('Missing NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY');
-      }
-
-      const signature = await transferToken({
-        rpcUrl: process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.devnet.solana.com',
-        payerSecretBase64: raw,
-        tokenMintAddress: tokenMint,
-        recipientAddress: recipient,
+      const signature = await requestInteractionWallet(signMessage, publicKey?.toBase58(), 'token-transfer', {
+        tokenMint,
+        recipient,
         amount: Number(tokenAmount),
       });
 
       setStatus(`SPL token transfer sent: ${signature.slice(0, 8)}...`);
-    } catch (err: any) {
-      setStatus(err.message || 'Token transfer failed');
+    } catch (err: unknown) {
+      setStatus((err instanceof Error ? err.message : String(err)) || 'Token transfer failed');
     } finally {
       setLoading(false);
     }
@@ -198,7 +195,7 @@ export default function InteractionWalletPanel() {
 
       {quote && (
         <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-100">
-          Jupiter outAmount: {quote?.outAmount || 'n/a'}
+          Jupiter outAmount: {String(quote.outAmount || 'n/a')}
         </div>
       )}
     </div>

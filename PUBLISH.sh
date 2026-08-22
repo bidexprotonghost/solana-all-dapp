@@ -57,7 +57,7 @@ echo ""
 echo "Step 4: Add Environment Variables:"
 echo "        NEXT_PUBLIC_SOLANA_RPC=https://api.devnet.solana.com"
 echo "        NEXT_PUBLIC_ADMIN_PUBLIC_KEY=<your-wallet>"
-echo "        NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=<base64-key>"
+echo "        INTERACTION_WALLET_PRIVATE_KEY=<server-side base64 key>"
 echo ""
 echo "Step 5: Click 'Deploy' ✅"
 echo ""
@@ -77,7 +77,7 @@ docker build -t solana-admin-dapp:1.0.0 .
 docker run -p 3000:3000 \
   -e NEXT_PUBLIC_SOLANA_RPC="https://api.devnet.solana.com" \
   -e NEXT_PUBLIC_ADMIN_PUBLIC_KEY="<wallet>" \
-  -e NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY="<key>" \
+  -e INTERACTION_WALLET_PRIVATE_KEY="<key>" \
   solana-admin-dapp:1.0.0
 
 echo "✅ Running on http://localhost:3000"

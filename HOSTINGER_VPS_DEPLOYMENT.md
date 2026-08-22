@@ -57,7 +57,7 @@ npm install
 cat > .env.local << 'EOF'
 NEXT_PUBLIC_SOLANA_RPC=https://api.devnet.solana.com
 NEXT_PUBLIC_ADMIN_PUBLIC_KEY=your-admin-wallet-address
-NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=base64-encoded-keypair
+INTERACTION_WALLET_PRIVATE_KEY=base64-encoded-keypair
 EOF
 ```
 
@@ -113,7 +113,7 @@ docker build -t solana-admin-dapp:1.0.0 .
 cat > .env.docker << 'EOF'
 NEXT_PUBLIC_SOLANA_RPC=https://api.devnet.solana.com
 NEXT_PUBLIC_ADMIN_PUBLIC_KEY=your-admin-wallet-address
-NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=base64-encoded-keypair
+INTERACTION_WALLET_PRIVATE_KEY=base64-encoded-keypair
 EOF
 ```
 
@@ -179,7 +179,7 @@ module.exports = {
     env: {
       NEXT_PUBLIC_SOLANA_RPC: 'https://api.devnet.solana.com',
       NEXT_PUBLIC_ADMIN_PUBLIC_KEY: 'your-admin-wallet-address',
-      NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY: 'base64-encoded-keypair'
+      INTERACTION_WALLET_PRIVATE_KEY: 'base64-encoded-keypair'
     },
     instances: 'max',
     exec_mode: 'cluster',
@@ -279,10 +279,10 @@ sudo systemctl enable certbot.timer
 - Find in Phantom wallet → Public Key
 - Format: Base58 string like `7x8...kL9`
 
-### `NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY`
+### `INTERACTION_WALLET_PRIVATE_KEY`
 **Interaction Wallet Private Key (Base64)**
 - Generate from Solana CLI or Phantom export
-- Must be Base64 encoded for security
+- Keep it server-side; it is never a `NEXT_PUBLIC_*` variable
 - Example: `aW1wb3J0c2VjcmV0a2V5aGVyZWJhc2U2NGVuY29kZWQ=`
 
 **⚠️ SECURITY**: Never commit `.env` files to Git!

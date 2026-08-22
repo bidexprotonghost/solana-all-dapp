@@ -285,7 +285,7 @@ my-project/
    ```env
    NEXT_PUBLIC_SOLANA_RPC=<rpc-endpoint>
    NEXT_PUBLIC_ADMIN_PUBLIC_KEY=<admin-wallet>
-   NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=<base64-key>
+   INTERACTION_WALLET_PRIVATE_KEY=<base64-key>
    ```
 
 2. **Anchor Program**

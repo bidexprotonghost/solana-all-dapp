@@ -75,8 +75,8 @@ NEXT_PUBLIC_SOLANA_RPC=https://api.devnet.solana.com
 # Required for admin dashboard
 NEXT_PUBLIC_ADMIN_PUBLIC_KEY=<admin-wallet-public-key>
 
-# Required for wallet send/receive operations
-NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=<base64-encoded-keypair>
+# Server-side only; required for wallet send/receive operations
+INTERACTION_WALLET_PRIVATE_KEY=<base64-encoded-keypair>
 ```
 
 ### How to Set Up Private Key
@@ -87,7 +87,7 @@ NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=<base64-encoded-keypair>
 echo '<secret-key-bytes>' | base64
 
 # 4. Add to .env.local
-NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=<base64-string>
+INTERACTION_WALLET_PRIVATE_KEY=<base64-string>
 ```
 
 ---
@@ -128,7 +128,7 @@ solana-keygen new --no-passphrase -o interaction-wallet.json
 cat interaction-wallet.json | base64 | tr -d '\n'
 
 # 3. Add to app/.env.local
-NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=<base64-string>
+INTERACTION_WALLET_PRIVATE_KEY=<base64-string>
 ```
 
 ### Step 5: Build & Deploy Frontend

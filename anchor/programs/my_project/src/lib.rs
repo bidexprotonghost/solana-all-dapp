@@ -1,6 +1,10 @@
 use anchor_lang::prelude::*;
+use anchor_lang::system_program;
 
-declare_id!("11111111111111111111111111111111");
+pub mod logic;
+use logic::{apply_stake, apply_unstake, toggle_entry, ToggleOutcome, MAX_ALLOWLIST};
+
+declare_id!("Eq53F3ZUR9HjhHpJfNkB53pZ4FXjtNm65uTym35zzexj");
 
 #[program]
 pub mod my_project {
@@ -39,33 +43,26 @@ pub mod my_project {
     pub fn toggle_allowlist(ctx: Context<ToggleAllowlist>, user: Pubkey) -> Result<()> {
         require_keys_eq!(ctx.accounts.state.admin, ctx.accounts.admin.key(), MyError::Unauthorized);
 
-        if let Some(index) = ctx.accounts.state.allowlist.iter().position(|existing| *existing == user) {
-            ctx.accounts.state.allowlist.remove(index);
-        } else {
-            if ctx.accounts.state.allowlist.len() >= 32 {
-                return err!(MyError::AllowlistFull);
-            }
-            ctx.accounts.state.allowlist.push(user);
+        match toggle_entry(&mut ctx.accounts.state.allowlist, user, MAX_ALLOWLIST) {
+            ToggleOutcome::Full => err!(MyError::AllowlistFull),
+            ToggleOutcome::Added | ToggleOutcome::Removed => Ok(()),
         }
-
-        Ok(())
     }
 
     pub fn stake(ctx: Context<Stake>, amount: u64) -> Result<()> {
         require!(!ctx.accounts.state.paused, MyError::Paused);
         require!(amount > 0, MyError::InvalidAmount);
 
+        let (new_amount, new_total) =
+            apply_stake(ctx.accounts.staker.amount, ctx.accounts.state.total_staked, amount)
+                .ok_or(MyError::Overflow)?;
+
         let staker = &mut ctx.accounts.staker;
         staker.owner = ctx.accounts.user.key();
-        staker.amount = staker.amount.checked_add(amount).ok_or(MyError::Overflow)?;
+        staker.amount = new_amount;
         staker.staked_at = Clock::get()?.unix_timestamp;
         staker.bump = ctx.bumps.staker;
-
-        ctx.accounts.state.total_staked = ctx.accounts
-            .state
-            .total_staked
-            .checked_add(amount)
-            .ok_or(MyError::Overflow)?;
+        ctx.accounts.state.total_staked = new_total;
 
         Ok(())
     }
@@ -75,24 +72,51 @@ pub mod my_project {
         require_keys_eq!(ctx.accounts.staker.owner, ctx.accounts.user.key(), MyError::Unauthorized);
         require!(ctx.accounts.staker.amount >= amount, MyError::InsufficientBalance);
 
+        let (new_amount, new_total, new_withdrawn) = apply_unstake(
+            ctx.accounts.staker.amount,
+            ctx.accounts.state.total_staked,
+            ctx.accounts.state.total_withdrawn,
+            amount,
+        )
+        .ok_or(MyError::Overflow)?;
+
         let staker = &mut ctx.accounts.staker;
-        staker.amount = staker.amount.checked_sub(amount).ok_or(MyError::Overflow)?;
+        staker.amount = new_amount;
         staker.staked_at = Clock::get()?.unix_timestamp;
-
-        ctx.accounts.state.total_staked = ctx.accounts
-            .state
-            .total_staked
-            .checked_sub(amount)
-            .ok_or(MyError::Overflow)?;
-
-        ctx.accounts.state.total_withdrawn = ctx.accounts
-            .state
-            .total_withdrawn
-            .checked_add(amount)
-            .ok_or(MyError::Overflow)?;
+        ctx.accounts.state.total_staked = new_total;
+        ctx.accounts.state.total_withdrawn = new_withdrawn;
 
         Ok(())
     }
+
+    pub fn transfer_treasury(ctx: Context<VaultTransfer>, amount: u64) -> Result<()> {
+        vault_transfer_checked(&ctx, amount)
+    }
+
+    pub fn airdrop(ctx: Context<VaultTransfer>, amount: u64) -> Result<()> {
+        vault_transfer_checked(&ctx, amount)
+    }
+}
+
+/// Shared admin-gated lamport transfer out of the program vault PDA.
+fn vault_transfer_checked(ctx: &Context<VaultTransfer>, amount: u64) -> Result<()> {
+    require_keys_eq!(ctx.accounts.state.admin, ctx.accounts.admin.key(), MyError::Unauthorized);
+    require!(amount > 0, MyError::InvalidAmount);
+    require!(ctx.accounts.vault.lamports() >= amount, MyError::InsufficientVaultFunds);
+
+    let bump = ctx.bumps.vault;
+    let seeds: &[&[u8]] = &[b"vault", &[bump]];
+    system_program::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.system_program.to_account_info(),
+            system_program::Transfer {
+                from: ctx.accounts.vault.to_account_info(),
+                to: ctx.accounts.recipient.to_account_info(),
+            },
+            &[seeds],
+        ),
+        amount,
+    )
 }
 
 #[derive(Accounts)]
@@ -169,6 +193,19 @@ pub struct Unstake<'info> {
     pub user: Signer<'info>,
 }
 
+#[derive(Accounts)]
+pub struct VaultTransfer<'info> {
+    #[account(seeds = [b"state"], bump = state.bump)]
+    pub state: Account<'info, GlobalState>,
+    #[account(mut, seeds = [b"vault"], bump)]
+    pub vault: SystemAccount<'info>,
+    /// CHECK: recipient only receives lamports; any address is acceptable.
+    #[account(mut)]
+    pub recipient: UncheckedAccount<'info>,
+    pub admin: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
 #[account]
 pub struct GlobalState {
     pub admin: Pubkey,
@@ -202,4 +239,6 @@ pub enum MyError {
     AllowlistFull,
     #[msg("Arithmetic overflow")]
     Overflow,
+    #[msg("Vault has insufficient funds")]
+    InsufficientVaultFunds,
 }

@@ -25,7 +25,7 @@ function isValidBase58PublicKey(address: string): boolean {
 }
 
 export function getInteractionWallet(): Keypair | null {
-  const raw = process.env.NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY;
+  const raw = process.env.INTERACTION_WALLET_PRIVATE_KEY;
   if (!raw || typeof raw !== 'string' || raw.trim().length === 0) {
     return null;
   }
@@ -49,7 +49,7 @@ export function getInteractionWalletAddress(): string {
 export async function receiveToInteractionWallet(): Promise<string> {
   const wallet = getInteractionWallet();
   if (!wallet) {
-    throw new Error('Interaction wallet is not configured. Add NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY to .env.local');
+    throw new Error('Interaction wallet is not configured on the server');
   }
 
   const connection = getConnection();
@@ -68,7 +68,7 @@ export async function receiveToInteractionWallet(): Promise<string> {
 export async function sendFromInteractionWallet(to: string, amountSol: number): Promise<string> {
   const wallet = getInteractionWallet();
   if (!wallet) {
-    throw new Error('Interaction wallet is not configured. Add NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY to .env.local');
+    throw new Error('Interaction wallet is not configured on the server');
   }
 
   if (!isValidBase58PublicKey(to)) {

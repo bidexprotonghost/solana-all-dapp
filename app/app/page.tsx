@@ -13,8 +13,8 @@ export default function HomePage() {
       <div className="mx-auto max-w-6xl">
         <header className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.25em] text-violet-400">My Project</p>
-            <h1 className="mt-2 text-4xl font-bold text-white">Solana dApp Dashboard</h1>
+            <p className="text-sm uppercase tracking-[0.25em] text-violet-400">Elite Interman</p>
+            <h1 className="mt-2 text-4xl font-bold text-white">Treasury & Governance Dashboard</h1>
           </div>
           <WalletConnectButton />
         </header>

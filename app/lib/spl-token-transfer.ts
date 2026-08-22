@@ -28,7 +28,7 @@ function validateTransferParams({
   amount: number;
 }): string | null {
   if (!rpcUrl || typeof rpcUrl !== 'string') return 'Invalid RPC URL';
-  if (!payerSecretBase64 || typeof payerSecretBase64 !== 'string') return 'Invalid payer secret';
+  if (!payerSecretBase64 || typeof payerSecretBase64 !== 'string') return 'Invalid payer secret configuration';
   if (!isValidAddress(tokenMintAddress)) return 'Invalid token mint address';
   if (!isValidAddress(recipientAddress)) return 'Invalid recipient address';
   if (typeof amount !== 'number' || !isFinite(amount)) return 'Invalid amount: must be a finite number';

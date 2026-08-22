@@ -212,7 +212,7 @@
 ### Environment Configuration
 - ✅ `NEXT_PUBLIC_SOLANA_RPC`: Optional (defaults to Devnet)
 - ✅ `NEXT_PUBLIC_ADMIN_PUBLIC_KEY`: Required for admin
-- ✅ `NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY`: Required for wallet ops
+- ✅ `INTERACTION_WALLET_PRIVATE_KEY`: Server-side only for wallet ops
 - ✅ `.env.local.example`: Provided as template
 
 ### Security Configuration

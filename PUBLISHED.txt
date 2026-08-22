@@ -110,7 +110,7 @@ Step 3: Deploy to Vercel
    └─ Add Environment Variables:
       - NEXT_PUBLIC_SOLANA_RPC
       - NEXT_PUBLIC_ADMIN_PUBLIC_KEY
-      - NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY
+      - INTERACTION_WALLET_PRIVATE_KEY (server-side only)
    └─ Deploy ✅
 
 Result: Live at https://your-project.vercel.app ✨
@@ -145,7 +145,7 @@ Step 2: Run Container
    docker run -p 3000:3000 \
      -e NEXT_PUBLIC_SOLANA_RPC="https://api.devnet.solana.com" \
      -e NEXT_PUBLIC_ADMIN_PUBLIC_KEY="<wallet>" \
-     -e NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY="<key>" \
+   -e INTERACTION_WALLET_PRIVATE_KEY="<key>" \
      solana-admin-dapp:1.0.0
 
 Result: Running on http://localhost:3000 ✨

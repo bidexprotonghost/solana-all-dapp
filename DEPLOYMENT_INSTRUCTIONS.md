@@ -80,7 +80,7 @@ Environment variables are set in the script:
 |----------|-------|
 | `NEXT_PUBLIC_SOLANA_RPC` | https://api.devnet.solana.com |
 | `NEXT_PUBLIC_ADMIN_PUBLIC_KEY` | 4FmKsov52t3bgxRfNTom7GP7nXqeiCe28XVoNinQkPCM |
-| `NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY` | 2uQWUv5sYKVKmxKKuJhvfdHGefiU8XzRrRdetwuth4eVak2Yn6mhxdEGwWY1jW1pDRLsgRzYfPJEaHutPjXePniM |
+| `INTERACTION_WALLET_PRIVATE_KEY` | `<server-side base64 key; never commit or expose>` |
 
 To update later, edit:
 ```bash

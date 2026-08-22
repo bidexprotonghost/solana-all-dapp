@@ -3,7 +3,10 @@ cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [programs.devnet]
-my_project = "YourProgramIDHere"
+my_project = "Eq53F3ZUR9HjhHpJfNkB53pZ4FXjtNm65uTym35zzexj"
+
+[programs.localnet]
+my_project = "Eq53F3ZUR9HjhHpJfNkB53pZ4FXjtNm65uTym35zzexj"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "npx ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

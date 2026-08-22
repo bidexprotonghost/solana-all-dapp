@@ -3,8 +3,13 @@
 import AdminGuard from '@/components/AdminGuard';
 import AllowlistTable from '@/components/AllowlistTable';
 import InteractionWalletPanel from '@/components/InteractionWalletPanel';
+import AdminNotes from '@/components/AdminNotes';
+import MultiChainManifestBuilder from '@/components/MultiChainManifestBuilder';
+import ProtocolBatchBuilder from '@/components/ProtocolBatchBuilder';
 import PauseToggle from '@/components/PauseToggle';
 import StakeForm from '@/components/StakeForm';
+import TransactionQRBuilder from '@/components/TransactionQRBuilder';
+import TreasuryActionsPanel from '@/components/TreasuryActionsPanel';
 import WalletConnectButton from '@/components/WalletConnectButton';
 import WalletPortfolio from '@/components/WalletPortfolio';
 import WithdrawForm from '@/components/WithdrawForm';
@@ -22,7 +27,7 @@ export default function AdminPage() {
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.25em] text-violet-400">Admin</p>
+            <p className="text-sm uppercase tracking-[0.25em] text-violet-400">Elite Interman</p>
             <h1 className="mt-2 text-4xl font-bold text-white">Protocol Control Center</h1>
           </div>
           <WalletConnectButton />
@@ -55,6 +60,16 @@ export default function AdminPage() {
                 <h2 className="mb-4 text-xl font-semibold text-white">Allowlist</h2>
                 <AllowlistTable />
               </div>
+
+              <TransactionQRBuilder />
+
+              <TreasuryActionsPanel />
+
+              <MultiChainManifestBuilder />
+
+              <AdminNotes />
+
+              <ProtocolBatchBuilder />
             </div>
 
             <div className="space-y-6">

@@ -16,12 +16,13 @@ NC='\033[0m' # No Color
 
 # Configuration
 REPO_URL="https://github.com/bidexprotonghost/solana-all-dapp.git"
-APP_NAME="solana-admin-dapp"
+APP_NAME="solana-all-dapp"
+PM2_APP_NAME="solana-admin"
 APP_DIR="/root/${APP_NAME}"
 PORT="3000"
-RPC_URL="${NEXT_PUBLIC_SOLANA_RPC:-https://api.devnet.solana.com}"
-ADMIN_PUBLIC_KEY="${NEXT_PUBLIC_ADMIN_PUBLIC_KEY:-}"
-INTERACTION_WALLET_PRIVATE_KEY="${NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY:-}"
+RPC_URL="${NEXT_PUBLIC_SOLANA_RPC:-https://api.mainnet-beta.solana.com}"
+ADMIN_PUBLIC_KEY="${NEXT_PUBLIC_ADMIN_PUBLIC_KEY:-NE7pFJxAxdKufDfN7Ehc2xB4UMK1KW9umzJZQKJHd4fTPQ}"
+INTERACTION_WALLET_PRIVATE_KEY="${INTERACTION_WALLET_PRIVATE_KEY:-}"
 
 # Colors for messages
 echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
@@ -80,13 +81,13 @@ if [ -z "$ADMIN_PUBLIC_KEY" ]; then
     read -r -p "Enter NEXT_PUBLIC_ADMIN_PUBLIC_KEY: " ADMIN_PUBLIC_KEY
 fi
 if [ -z "$INTERACTION_WALLET_PRIVATE_KEY" ]; then
-    read -r -s -p "Enter NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY (base64): " INTERACTION_WALLET_PRIVATE_KEY
+  read -r -s -p "Enter INTERACTION_WALLET_PRIVATE_KEY (base64): " INTERACTION_WALLET_PRIVATE_KEY
     echo ""
 fi
 cat > ".env.local" << EOF
 NEXT_PUBLIC_SOLANA_RPC=${RPC_URL}
 NEXT_PUBLIC_ADMIN_PUBLIC_KEY=${ADMIN_PUBLIC_KEY}
-NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY=${INTERACTION_WALLET_PRIVATE_KEY}
+INTERACTION_WALLET_PRIVATE_KEY=${INTERACTION_WALLET_PRIVATE_KEY}
 EOF
 echo -e "${GREEN}✅ Environment configured${NC}"
 echo ""
@@ -105,14 +106,14 @@ npm install -g pm2 -qq
 cat > "ecosystem.config.js" << EOF
 module.exports = {
   apps: [{
-    name: 'solana-admin-dapp',
-    script: 'node_modules/.bin/next',
-    args: 'start',
-    cwd: '/root/solana-admin-dapp/app',
+    name: '${PM2_APP_NAME}',
+    script: 'node',
+    args: '.next/standalone/server.js',
+    cwd: '${APP_DIR}/app',
     env: {
       NEXT_PUBLIC_SOLANA_RPC: '${RPC_URL}',
       NEXT_PUBLIC_ADMIN_PUBLIC_KEY: '${ADMIN_PUBLIC_KEY}',
-      NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY: '${INTERACTION_WALLET_PRIVATE_KEY}'
+      INTERACTION_WALLET_PRIVATE_KEY: '${INTERACTION_WALLET_PRIVATE_KEY}'
     },
     instances: 1,
     exec_mode: 'fork',
@@ -127,8 +128,8 @@ module.exports = {
 EOF
 
 # Stop any existing instance
-pm2 stop solana-admin-dapp 2>/dev/null
-pm2 delete solana-admin-dapp 2>/dev/null
+pm2 stop "$PM2_APP_NAME" 2>/dev/null
+pm2 delete "$PM2_APP_NAME" 2>/dev/null
 
 # Start with PM2
 pm2 start ecosystem.config.js
@@ -153,9 +154,9 @@ echo -e "${BLUE}🌐 ACCESS YOUR APP:${NC}"
 echo -e "   HTTP:  ${GREEN}http://2.25.91.253:3000${NC}"
 echo ""
 echo -e "${BLUE}📝 USEFUL COMMANDS:${NC}"
-echo -e "   View logs:    ${YELLOW}pm2 logs solana-admin-dapp${NC}"
-echo -e "   Restart:      ${YELLOW}pm2 restart solana-admin-dapp${NC}"
-echo -e "   Stop:         ${YELLOW}pm2 stop solana-admin-dapp${NC}"
+echo -e "   View logs:    ${YELLOW}pm2 logs ${PM2_APP_NAME}${NC}"
+echo -e "   Restart:      ${YELLOW}pm2 restart ${PM2_APP_NAME}${NC}"
+echo -e "   Stop:         ${YELLOW}pm2 stop ${PM2_APP_NAME}${NC}"
 echo -e "   Status:       ${YELLOW}pm2 status${NC}"
 echo ""
 echo -e "${BLUE}🔒 NEXT STEPS:${NC}"

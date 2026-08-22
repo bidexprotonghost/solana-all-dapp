@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 members = [
   "programs/my_project",
 ]
@@ -6,3 +7,4 @@ members = [
 [profile.release]
 lto = true
 codegen-units = 1
+overflow-checks = true

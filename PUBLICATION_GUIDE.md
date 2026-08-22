@@ -115,7 +115,7 @@ MIT License - See [LICENSE](LICENSE)
 # 5. Add Environment Variables:
 #    - NEXT_PUBLIC_SOLANA_RPC
 #    - NEXT_PUBLIC_ADMIN_PUBLIC_KEY
-#    - NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY
+#    - INTERACTION_WALLET_PRIVATE_KEY (server-side only)
 # 6. Click "Deploy"
 
 # Option B: Via Vercel CLI
@@ -152,7 +152,7 @@ cat > netlify.toml << 'EOF'
 [context.production.environment]
   NEXT_PUBLIC_SOLANA_RPC = ""
   NEXT_PUBLIC_ADMIN_PUBLIC_KEY = ""
-  NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY = ""
+  INTERACTION_WALLET_PRIVATE_KEY = ""
 EOF
 ```
 
@@ -181,7 +181,7 @@ docker build -t solana-admin-dapp:1.0.0 .
 docker run -p 3000:3000 \
   -e NEXT_PUBLIC_SOLANA_RPC="https://api.devnet.solana.com" \
   -e NEXT_PUBLIC_ADMIN_PUBLIC_KEY="<your-admin-wallet>" \
-  -e NEXT_PUBLIC_INTERACTION_WALLET_PRIVATE_KEY="<base64-key>" \
+  -e INTERACTION_WALLET_PRIVATE_KEY="<base64-key>" \
   solana-admin-dapp:1.0.0
 
 # Or use docker-compose

@@ -2,8 +2,8 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata = {
-  title: 'My Project Admin',
-  description: 'Solana admin dashboard',
+  title: 'Elite Interman Admin',
+  description: 'Elite Interman treasury, governance, and protocol admin dashboard',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
